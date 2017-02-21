@@ -29,10 +29,34 @@ class Ping(Resource):
     def get(self):
         return {"response": "pong"}
 
-class ServerList(Resource):
+class Server(Resource):
+    def post(self, name, creator):
+        server = NOVA.servers.create(
+            name=name,
+            image=NOVA.glance.find_image('ubuntu/trusty64'),
+            flavor=[flavor for flavor in NOVA.flavors.list() if flavor.name == 'm1.big'],
+            # TODO requires neutron client
+            security_groups=['344188ea-7747-4a67-8517-743e99799fda'],
+            userdata='',
+            key_name='bs',
+            # TODO requires neutron client
+            nics=[{
+                "net-id": '832bbfef-7ebd-4da5-8029-f7cf89e4ee5e',
+                "v4-fixed-ip": ''
+            }]
+        )
+        server.tag('creator={}'.format(creator))
 
+        return '', 202
+
+    def delete(self, name):
+        server = [server for server in NOVA.servers.list() if server.name == name][0]
+        server.delete()
+        return '', 204
+
+class ServerList(Resource):
     def get(self):
-        return [server.to_dict() for server in NOVA.servers.list()]
+        return [server.to_dict() for server in NOVA.servers.list()], 200
 
 def initialize_application():
 
