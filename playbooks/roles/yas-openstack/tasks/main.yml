@@ -1,0 +1,12 @@
+---
+# tasks file for yas-openstack
+- name: clone YasOpenstack repository
+  git:
+    repo=https://github.com/refinery29/YasOpenstack.git
+    dest={{ local_repository }}
+    accept_hostkey=yes
+
+- name: install YasOpenstack
+  pip:
+    name={{ local_repository }}
+    state=present

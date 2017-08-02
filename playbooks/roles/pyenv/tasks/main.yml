@@ -1,0 +1,84 @@
+---
+- name: Create pyenv group
+  group: name=pyenv system=yes
+
+- name: Give pyenv group access to the pyenv directory
+  file:
+    path=/usr/local/lib/pyenv
+    group=pyenv
+    recurse=yes
+    mode=2775
+    state=directory
+
+- name: Clone pyenv
+  git:
+    repo=https://github.com/yyuu/pyenv.git
+    dest=/usr/local/lib/pyenv
+    update=no
+
+- name: Add users to pyenv group
+  user:
+    name={{ item }}
+    append=yes
+    groups=pyenv
+  with_items: "{{ users }}"
+
+- name: Add PYENV_ROOT to global environment
+  lineinfile:
+    line=PYENV_ROOT=/usr/local/lib/pyenv
+    insertbefore=PATH=
+    dest=/etc/environment
+
+- name: Update global PATH with pyenv bin
+  lineinfile:
+    regexp='(^PATH=")(?!/usr/local/lib/pyenv/bin:)(.*)'
+    line='\1/usr/local/lib/pyenv/bin:\2'
+    backrefs=yes
+    dest=/etc/environment
+
+- name: Make pyenv intialize on login
+  copy:
+    dest=/etc/profile.d/pyenv.sh
+    content='eval "$(pyenv init -)"'
+
+- name: Install some common deps
+  apt:
+    state=latest
+    pkg={{ item }}
+    update_cache=yes
+    cache_valid_time=1800
+  with_items:
+    - zlib1g-dev
+    - openssl
+    - libbz2-dev
+    - libreadline6-dev
+    - libssl-dev
+    - libsqlite3-dev
+    - libsystemd-dev
+    - build-essential
+
+- name: Get existing pythons
+  command: ls /usr/local/lib/pyenv/versions
+  register: versions
+  changed_when: no
+  ignore_errors: yes
+
+- name: Install some pythons
+  command: /usr/local/lib/pyenv/bin/pyenv install {{ item }}
+  environment:
+    PYENV_ROOT: /usr/local/lib/pyenv
+  with_items: "{{ pythons }}"
+  when: not item in versions.stdout_lines | map('trim')
+
+- name: Set 3.6.0 as default python
+  copy:
+    dest=/usr/local/lib/pyenv/version
+    content=3.6.0
+
+- name: Ensure the pyenv dir has correct permissions
+  file:
+    path=/usr/local/lib/pyenv
+    group=pyenv
+    recurse=yes
+    mode=2775
+    state=directory

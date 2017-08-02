@@ -1,0 +1,4 @@
+dependencies:
+  - name: yas
+    src: https://github.com/refinery29/yas.git
+    scm: git

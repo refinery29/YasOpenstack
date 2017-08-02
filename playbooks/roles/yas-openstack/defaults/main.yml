@@ -1,0 +1,3 @@
+---
+# defaults file for yas-openstack
+local_repository: '/srv/YasOpenstack'

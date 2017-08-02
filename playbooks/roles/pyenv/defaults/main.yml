@@ -1,0 +1,3 @@
+---
+users: [ ubuntu ]
+pythons: [ 3.6.0 ]
