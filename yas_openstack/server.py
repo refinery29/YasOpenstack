@@ -59,8 +59,9 @@ class ServerManager(Client):
             uri = webhook['url'] + '?' + encoded_query
             request = urllib.request.Request(uri, method='POST')
             urllib.request.urlopen(request)
-        server = self.servers.get(server.id)
-        server.delete()
+        else:
+            server = self.servers.get(server.id)
+            server.delete()
 
     def find(self, detailed=True, metadata=None, **kwargs):
         servers = self.findall(detailed=detailed, metadata=metadata, **kwargs)
