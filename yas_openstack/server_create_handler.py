@@ -94,5 +94,5 @@ class OpenStackServerCreateHandler(OpenStackHandler):
                 return reply(forbidden.message)
             # pylint: disable=raising-bad-type
             raise forbidden
-        reply(f'Starting {name} from image {server.id}')
-        self.bot.log.debug(f'Created used userdata:\n{userdata}')
+        reply(f"Starting {name} from image {server.image['id']}")
+        self.bot.log.debug(f"Created used userdata:\n{userdata}")

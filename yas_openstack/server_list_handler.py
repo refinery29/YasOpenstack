@@ -106,7 +106,7 @@ class OpenStackServerListHandler(OpenStackHandler):
             fields = []
 
         return dict(
-            title=f"{server['name']}.{self.config.domain} from image {server['id']}",
+            title=f"{server['name']}.{self.config.domain} from image {server.image['id']}",
             title_link=f"http://www.{server['name']}.{self.config.domain}",
             fields=fields,
             color=attachment_color)
